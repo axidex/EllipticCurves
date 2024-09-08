@@ -1,0 +1,172 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/api/cypher/elliptic/decrypt": {
+            "post": {
+                "description": "Decrypts encrypted data using a private PEM key provided in the form and encrypted data in the request body.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Encryption"
+                ],
+                "summary": "Decrypt data using PEM key",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Private PEM Key",
+                        "name": "pemKey",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "description": "Encrypted data (raw bytes)",
+                        "name": "encryptedData",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Decrypted text",
+                        "schema": {
+                            "$ref": "#/definitions/api.ResultData"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/cypher/elliptic/encrypt": {
+            "post": {
+                "description": "Encrypt the provided text using the given public key",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/octet-stream"
+                ],
+                "tags": [
+                    "encryption"
+                ],
+                "summary": "Encrypt data",
+                "parameters": [
+                    {
+                        "description": "Encrypt data",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.EncryptData"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Encrypted data as binary",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/cypher/elliptic/keys": {
+            "get": {
+                "description": "Generate a public key using the elliptic curve algorithm",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "keys"
+                ],
+                "summary": "Generate a public key",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.Keys"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "api.EncryptData": {
+            "type": "object",
+            "properties": {
+                "public": {
+                    "type": "string"
+                },
+                "text": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.Keys": {
+            "type": "object",
+            "properties": {
+                "private": {
+                    "type": "string"
+                },
+                "public": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.ResultData": {
+            "type": "object",
+            "required": [
+                "text"
+            ],
+            "properties": {
+                "text": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

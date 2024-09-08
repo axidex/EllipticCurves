@@ -1,0 +1,113 @@
+definitions:
+  api.EncryptData:
+    properties:
+      public:
+        type: string
+      text:
+        type: string
+    type: object
+  api.Keys:
+    properties:
+      private:
+        type: string
+      public:
+        type: string
+    type: object
+  api.ResultData:
+    properties:
+      text:
+        type: string
+    required:
+    - text
+    type: object
+info:
+  contact: {}
+paths:
+  /api/cypher/elliptic/decrypt:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Decrypts encrypted data using a private PEM key provided in the
+        form and encrypted data in the request body.
+      parameters:
+      - description: Private PEM Key
+        in: formData
+        name: pemKey
+        required: true
+        type: string
+      - description: Encrypted data (raw bytes)
+        in: body
+        name: encryptedData
+        required: true
+        schema:
+          items:
+            type: integer
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Decrypted text
+          schema:
+            $ref: '#/definitions/api.ResultData'
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Decrypt data using PEM key
+      tags:
+      - Encryption
+  /api/cypher/elliptic/encrypt:
+    post:
+      consumes:
+      - application/json
+      description: Encrypt the provided text using the given public key
+      parameters:
+      - description: Encrypt data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.EncryptData'
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: Encrypted data as binary
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Encrypt data
+      tags:
+      - encryption
+  /api/cypher/elliptic/keys:
+    get:
+      consumes:
+      - application/json
+      description: Generate a public key using the elliptic curve algorithm
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Keys'
+      summary: Generate a public key
+      tags:
+      - keys
+swagger: "2.0"
