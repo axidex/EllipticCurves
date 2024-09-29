@@ -22,3 +22,8 @@ re:
 
 swag:
 	swag init -g  ./cmd/main/main.go
+
+update:
+	go get github.com/axidex/Unknown
+
+
