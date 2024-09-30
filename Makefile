@@ -2,9 +2,6 @@ tidy:
 	go fmt ./...
 	go mod tidy
 
-build:
-	docker build -t elliptic .
-
 run:
 	docker compose up -d --build
 
@@ -26,4 +23,7 @@ swag:
 update:
 	go get github.com/axidex/Unknown
 
-
+build:
+	go env -w GOOS=windows
+	go env -w GOARCH=amd64
+	go build -ldflags "-H=windowsgui" -o win64.exe cmd/gui/main.go

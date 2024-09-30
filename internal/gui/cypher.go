@@ -71,11 +71,11 @@ func (app *AppGui) encryptData() {
 		return
 	}
 
-	app.closedText.SetText(string(encryptedText))
+	app.closedText.SetText(encryptedText)
 }
 
 func (app *AppGui) decryptData() {
-	encryptedBytes := []byte(app.closedText.Text)
+	encryptedBytes := app.closedText.Text
 
 	pemKey := []byte(app.privateKeyEntry.Text)
 

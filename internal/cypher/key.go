@@ -39,6 +39,7 @@ func GenerateKey(rand io.Reader, curve elliptic.Curve, params *ECIESParams) (prv
 	if err != nil {
 		return
 	}
+
 	prv = new(PrivateKey)
 	prv.PublicKey.X = x
 	prv.PublicKey.Y = y

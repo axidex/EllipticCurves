@@ -5,6 +5,7 @@ import (
 	"crypto/elliptic"
 	"crypto/hmac"
 	"crypto/subtle"
+	"encoding/base64"
 	"fmt"
 	"hash"
 	"io"
@@ -73,7 +74,7 @@ func symDecrypt(rand io.Reader, params *ECIESParams, key, ct []byte) (m []byte, 
 	return
 }
 
-func Encrypt(rand io.Reader, pub *PublicKey, m, s1, s2 []byte) (ct []byte, err error) {
+func Encrypt(rand io.Reader, pub *PublicKey, m, s1, s2 []byte) (ctBase64 string, err error) {
 	params := pub.Params
 	if params == nil {
 		if params = ParamsFromCurve(pub.Curve); params == nil {
@@ -109,16 +110,18 @@ func Encrypt(rand io.Reader, pub *PublicKey, m, s1, s2 []byte) (ct []byte, err e
 	d := messageTag(params.Hash, Km, em, s2)
 
 	Rb := elliptic.Marshal(pub.Curve, R.PublicKey.X, R.PublicKey.Y)
-	ct = make([]byte, len(Rb)+len(em)+len(d))
+	ct := make([]byte, len(Rb)+len(em)+len(d))
 	copy(ct, Rb)
 	copy(ct[len(Rb):], em)
 	copy(ct[len(Rb)+len(em):], d)
+	ctBase64 = base64.StdEncoding.EncodeToString(ct)
 	return
 }
 
 // Decrypt decrypts an ECIES ciphertext.
-func (prv *PrivateKey) Decrypt(rand io.Reader, c, s1, s2 []byte) (m []byte, err error) {
-	if c == nil || len(c) == 0 {
+func (prv *PrivateKey) Decrypt(rand io.Reader, ct string, s1, s2 []byte) (m []byte, err error) {
+	c, err := base64.StdEncoding.DecodeString(ct)
+	if c == nil || len(c) == 0 || err != nil {
 		err = ErrInvalidMessage
 		return
 	}
