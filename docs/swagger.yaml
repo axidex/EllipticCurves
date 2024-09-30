@@ -1,10 +1,14 @@
 definitions:
-  api.EncryptData:
+  api.EncryptRequest:
     properties:
-      public:
+      pemKey:
+        description: Ключ как строка
         type: string
       text:
         type: string
+    required:
+    - pemKey
+    - text
     type: object
   api.Keys:
     properties:
@@ -13,73 +17,58 @@ definitions:
       public:
         type: string
     type: object
-  api.ResultData:
-    properties:
-      text:
-        type: string
-    required:
-    - text
-    type: object
 info:
   contact: {}
 paths:
   /api/cypher/elliptic/decrypt:
     post:
       consumes:
-      - multipart/form-data
-      description: Decrypts encrypted data using a private PEM key provided in the
-        form and encrypted data in the request body.
+      - application/json
+      description: Decrypt the provided text using the given public key
       parameters:
-      - description: Private PEM Key
-        in: formData
-        name: pemKey
-        required: true
-        type: string
-      - description: Encrypted data (raw bytes)
+      - description: Payload
         in: body
-        name: encryptedData
+        name: payload
         required: true
         schema:
-          items:
-            type: integer
-          type: array
+          $ref: '#/definitions/api.EncryptRequest'
       produces:
-      - application/json
+      - text/plain
       responses:
         "200":
-          description: Decrypted text
+          description: Decrypted data
           schema:
-            $ref: '#/definitions/api.ResultData'
+            type: string
         "400":
-          description: Invalid request
+          description: Bad Request
           schema:
             additionalProperties: true
             type: object
         "500":
-          description: Internal server error
+          description: Internal Server Error
           schema:
             additionalProperties: true
             type: object
-      summary: Decrypt data using PEM key
+      summary: Decrypt data
       tags:
-      - Encryption
+      - encryption
   /api/cypher/elliptic/encrypt:
     post:
       consumes:
       - application/json
       description: Encrypt the provided text using the given public key
       parameters:
-      - description: Encrypt data
+      - description: Payload
         in: body
-        name: data
+        name: payload
         required: true
         schema:
-          $ref: '#/definitions/api.EncryptData'
+          $ref: '#/definitions/api.EncryptRequest'
       produces:
-      - application/octet-stream
+      - text/plain
       responses:
         "200":
-          description: Encrypted data as binary
+          description: Encrypted data
           schema:
             type: string
         "400":

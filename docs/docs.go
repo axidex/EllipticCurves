@@ -17,54 +17,44 @@ const docTemplate = `{
     "paths": {
         "/api/cypher/elliptic/decrypt": {
             "post": {
-                "description": "Decrypts encrypted data using a private PEM key provided in the form and encrypted data in the request body.",
+                "description": "Decrypt the provided text using the given public key",
                 "consumes": [
-                    "multipart/form-data"
-                ],
-                "produces": [
                     "application/json"
                 ],
-                "tags": [
-                    "Encryption"
+                "produces": [
+                    "text/plain"
                 ],
-                "summary": "Decrypt data using PEM key",
+                "tags": [
+                    "encryption"
+                ],
+                "summary": "Decrypt data",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Private PEM Key",
-                        "name": "pemKey",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "description": "Encrypted data (raw bytes)",
-                        "name": "encryptedData",
+                        "description": "Payload",
+                        "name": "payload",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "integer"
-                            }
+                            "$ref": "#/definitions/api.EncryptRequest"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Decrypted text",
+                        "description": "Decrypted data",
                         "schema": {
-                            "$ref": "#/definitions/api.ResultData"
+                            "type": "string"
                         }
                     },
                     "400": {
-                        "description": "Invalid request",
+                        "description": "Bad Request",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
                     },
                     "500": {
-                        "description": "Internal server error",
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -80,7 +70,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "produces": [
-                    "application/octet-stream"
+                    "text/plain"
                 ],
                 "tags": [
                     "encryption"
@@ -88,18 +78,18 @@ const docTemplate = `{
                 "summary": "Encrypt data",
                 "parameters": [
                     {
-                        "description": "Encrypt data",
-                        "name": "data",
+                        "description": "Payload",
+                        "name": "payload",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/api.EncryptData"
+                            "$ref": "#/definitions/api.EncryptRequest"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Encrypted data as binary",
+                        "description": "Encrypted data",
                         "schema": {
                             "type": "string"
                         }
@@ -146,10 +136,15 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "api.EncryptData": {
+        "api.EncryptRequest": {
             "type": "object",
+            "required": [
+                "pemKey",
+                "text"
+            ],
             "properties": {
-                "public": {
+                "pemKey": {
+                    "description": "Ключ как строка",
                     "type": "string"
                 },
                 "text": {
@@ -164,17 +159,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "public": {
-                    "type": "string"
-                }
-            }
-        },
-        "api.ResultData": {
-            "type": "object",
-            "required": [
-                "text"
-            ],
-            "properties": {
-                "text": {
                     "type": "string"
                 }
             }

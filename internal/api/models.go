@@ -7,6 +7,11 @@ type EllipticArgs struct {
 	P int `json:"p" form:"p" binding:"required"` // Prime modulus
 }
 
+type EncryptRequest struct {
+	Text   string `json:"text" binding:"required"`
+	PEMKey string `json:"pemKey" binding:"required"` // Ключ как строка
+}
+
 type EncryptData struct {
 	Text string `json:"text"  form:"text"`
 }
