@@ -23,6 +23,9 @@ swag:
 update:
 	go get github.com/axidex/Unknown
 
+run-gui:
+	go run cmd/gui/main.go
+
 build:
 	go env -w GOOS=windows
 	go env -w GOARCH=amd64

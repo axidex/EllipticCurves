@@ -3,6 +3,7 @@ package gui
 import (
 	"crypto/rand"
 	"errors"
+	"fmt"
 	"fyne.io/fyne/v2/dialog"
 	"github.com/axidex/elliptic/internal/cypher"
 )
@@ -31,6 +32,17 @@ func (app *AppGui) generateKeys() {
 		return
 	}
 
+	curveInfoString := "y² = x³ - 3x + b\n" +
+		"B: %d\n" +
+		"X: %d\n" +
+		"Y: %d\n" +
+		"Curve: %s\n" +
+		"BitSize: %d"
+
+	curveInfo := fmt.Sprintf(curveInfoString, keys.Curve.Params().B, keys.Curve.Params().Gx, keys.Curve.Params().Gy, keys.Curve.Params().Name, keys.Curve.Params().BitSize)
+
+	app.curveInfoEntry.SetText(curveInfo)
+
 	private, err := cypher.ExportPrivatePEM(keys)
 	if err != nil {
 		app.logger.Errorf("Encoding err: %s", err)
@@ -56,7 +68,6 @@ func (app *AppGui) encryptData() {
 	pemKey := []byte(app.publicKeyEntry.Text)
 
 	app.logger.Infof("Got task encryption")
-	app.logger.Infof("Creating public key from user input")
 	key, err := cypher.ImportPublicPEM(pemKey)
 	if err != nil {
 		app.logger.Infof("Not valid key: %v", err)

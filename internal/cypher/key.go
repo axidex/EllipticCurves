@@ -35,16 +35,16 @@ func MaxSharedKeyLength(pub *PublicKey) int {
 // GenerateKey Generate an elliptic curve public / private keypair. If params is nil,
 // the recommended default parameters for the key will be chosen.
 func GenerateKey(rand io.Reader, curve elliptic.Curve, params *ECIESParams) (prv *PrivateKey, err error) {
-	pb, x, y, err := elliptic.GenerateKey(curve, rand)
+	pb, err := ecdsa.GenerateKey(curve, rand)
 	if err != nil {
 		return
 	}
 
 	prv = new(PrivateKey)
-	prv.PublicKey.X = x
-	prv.PublicKey.Y = y
+	prv.PublicKey.X = pb.X
+	prv.PublicKey.Y = pb.Y
 	prv.PublicKey.Curve = curve
-	prv.D = new(big.Int).SetBytes(pb)
+	prv.D = pb.D
 	if params == nil {
 		params = ParamsFromCurve(curve)
 	}
