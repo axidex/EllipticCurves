@@ -16,7 +16,7 @@ const (
 var CurveNames = []string{
 	curveP256,
 	curveP384,
-	curveP521,
+	//curveP521,
 }
 
 func GetNameByCurve(curve elliptic.Curve) CurveName {
@@ -59,16 +59,17 @@ var ParamNames = []string{
 }
 
 func GetNameByParam(param *cypher.ECIESParams) ParamName {
-	switch param {
-	case cypher.EciesAes256Sha256:
-		return paramAes256Sha256
-	case cypher.EciesAes256Sha384:
-		return paramAes256Sha384
-	case cypher.EciesAes256Sha512:
-		return paramAes256Sha512
-	default:
+	if param.MacLen == 16 && param.KeyLen == 16 {
 		return paramAes128Sha256
+	} else if param.MacLen == 16 && param.KeyLen == 32 {
+		return paramAes256Sha256
+	} else if param.MacLen == 16 && param.KeyLen == 32 {
+		return paramAes256Sha384
+	} else if param.MacLen == 32 && param.KeyLen == 32 {
+		return paramAes256Sha512
 	}
+
+	return paramAes128Sha256
 }
 
 func (name ParamName) GetParamByName() *cypher.ECIESParams {

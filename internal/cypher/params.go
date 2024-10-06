@@ -24,6 +24,7 @@ var (
 		Cipher:    aes.NewCipher,
 		BlockSize: aes.BlockSize,
 		KeyLen:    16,
+		MacLen:    16,
 	}
 
 	EciesAes256Sha256 = &ECIESParams{
@@ -32,6 +33,7 @@ var (
 		Cipher:    aes.NewCipher,
 		BlockSize: aes.BlockSize,
 		KeyLen:    32,
+		MacLen:    16,
 	}
 
 	EciesAes256Sha384 = &ECIESParams{
@@ -40,6 +42,7 @@ var (
 		Cipher:    aes.NewCipher,
 		BlockSize: aes.BlockSize,
 		KeyLen:    32,
+		MacLen:    16,
 	}
 
 	EciesAes256Sha512 = &ECIESParams{
@@ -48,6 +51,7 @@ var (
 		Cipher:    aes.NewCipher,
 		BlockSize: aes.BlockSize,
 		KeyLen:    32,
+		MacLen:    32,
 	}
 )
 
@@ -61,7 +65,6 @@ var paramsFromCurve = map[elliptic.Curve]*ECIESParams{
 // Only the curves P256, P384, and P512 are supported.
 func ParamsFromCurve(curve elliptic.Curve) (params *ECIESParams) {
 	//return paramsFromCurve[curve]
-
 	switch curve {
 	case elliptic.P256():
 		return EciesAes128Sha256
@@ -72,7 +75,6 @@ func ParamsFromCurve(curve elliptic.Curve) (params *ECIESParams) {
 	default:
 		return nil
 	}
-
 }
 
 // DefaultCurve The default curve for this package is the NIST P256 curve, which
@@ -90,4 +92,5 @@ type ECIESParams struct {
 	Cipher    func([]byte) (cipher.Block, error) // symmetric cipher
 	BlockSize int                                // block size of symmetric cipher
 	KeyLen    int                                // length of symmetric key
+	MacLen    int                                // HMAC Length
 }

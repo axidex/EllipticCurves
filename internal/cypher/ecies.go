@@ -77,6 +77,7 @@ func symDecrypt(rand io.Reader, params *ECIESParams, key, ct []byte) (m []byte, 
 func Encrypt(rand io.Reader, pub *PublicKey, m, s1, s2 []byte) (ctBase64 string, err error) {
 	params := pub.Params
 	if params == nil {
+		fmt.Println("Params is nil! Generating params from curve")
 		if params = ParamsFromCurve(pub.Curve); params == nil {
 			err = ErrUnsupportedECIESParameters
 			return
@@ -88,16 +89,16 @@ func Encrypt(rand io.Reader, pub *PublicKey, m, s1, s2 []byte) (ctBase64 string,
 	}
 
 	hash := params.Hash()
-	z, err := R.GenerateShared(pub, params.KeyLen, params.KeyLen)
+	z, err := R.GenerateShared(pub, params.KeyLen, params.MacLen)
 	if err != nil {
 		return
 	}
-	K, err := concatKDF(hash, z, s1, params.KeyLen+params.KeyLen)
+	K, err := concatKDF(hash, z, s1, params.KeyLen+params.MacLen)
 	if err != nil {
 		return
 	}
 	Ke := K[:params.KeyLen]
-	Km := K[params.KeyLen:]
+	Km := K[params.MacLen:]
 	hash.Write(Km)
 	Km = hash.Sum(nil)
 	hash.Reset()
@@ -164,18 +165,18 @@ func (prv *PrivateKey) Decrypt(rand io.Reader, ct string, s1, s2 []byte) (m []by
 		return
 	}
 
-	z, err := prv.GenerateShared(R, params.KeyLen, params.KeyLen)
+	z, err := prv.GenerateShared(R, params.KeyLen, params.MacLen)
 	if err != nil {
 		return
 	}
 
-	K, err := concatKDF(curHash, z, s1, params.KeyLen+params.KeyLen)
+	K, err := concatKDF(curHash, z, s1, params.KeyLen+params.MacLen)
 	if err != nil {
 		return
 	}
 
 	Ke := K[:params.KeyLen]
-	Km := K[params.KeyLen:]
+	Km := K[params.MacLen:]
 	curHash.Write(Km)
 	Km = curHash.Sum(nil)
 	curHash.Reset()

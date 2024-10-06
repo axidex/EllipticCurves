@@ -439,15 +439,19 @@ func asnECDHtoParams(asnParams asnECDHAlgorithm, params *ECIESParams) {
 	if asnParams.Cmp(dhsinglepassStddhSha224kdf) {
 		params.hashAlgo = crypto.SHA224
 		params.Hash = sha256.New224
+		params.MacLen = 16
 	} else if asnParams.Cmp(dhsinglepassStddhSha256kdf) {
 		params.hashAlgo = crypto.SHA256
 		params.Hash = sha256.New
+		params.MacLen = 16
 	} else if asnParams.Cmp(dhsinglepassStddhSha384kdf) {
 		params.hashAlgo = crypto.SHA384
 		params.Hash = sha512.New384
+		params.MacLen = 16
 	} else if asnParams.Cmp(dhsinglepassStddhSha512kdf) {
 		params.hashAlgo = crypto.SHA512
 		params.Hash = sha512.New
+		params.MacLen = 32
 	} else {
 		params = nil
 	}

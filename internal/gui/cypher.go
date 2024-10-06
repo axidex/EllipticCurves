@@ -11,6 +11,7 @@ var (
 	ErrGeneratingKeys = errors.New("error generating keys")
 	ErrImportingKeys  = errors.New("error importing keys")
 	ErrEncrypt        = errors.New("error encrypt")
+	ErrMessage        = errors.New("empty message")
 	ErrDecrypt        = errors.New("error decrypt")
 )
 
@@ -22,10 +23,10 @@ func (app *AppGui) generateKeys() {
 		dialog.ShowError(ErrGeneratingKeys, app.w)
 		return
 	}
-	params := ParamName(app.selectParams.Selected).GetParamByName()
+	//params := ParamName(app.selectParams.Selected).GetParamByName()
 	curve := CurveName(app.selectCurve.Selected).GetCurveByName()
 	// Генерируем случайные ключи
-	keys, err := cypher.GenerateKey(rand.Reader, curve, params)
+	keys, err := cypher.GenerateKey(rand.Reader, curve, nil)
 	if err != nil {
 		app.logger.Errorf("GenerateKey err: %s", err)
 		dialog.ShowError(ErrGeneratingKeys, app.w)
@@ -55,6 +56,10 @@ func (app *AppGui) generateKeys() {
 
 func (app *AppGui) encryptData() {
 	text := app.openText.Text
+	//if len(text) == 0 {
+	//	dialog.ShowError(ErrMessage, app.w)
+	//	return
+	//}
 
 	pemKey := []byte(app.publicKeyEntry.Text)
 
@@ -71,7 +76,7 @@ func (app *AppGui) encryptData() {
 	encryptedText, err := cypher.Encrypt(rand.Reader, key, []byte(text), nil, nil)
 	if err != nil {
 		app.logger.Errorf("Encryption error %v", err)
-		dialog.ShowError(ErrEncrypt, app.w)
+		dialog.ShowError(err, app.w)
 		return
 	}
 
@@ -99,7 +104,7 @@ func (app *AppGui) decryptData() {
 	decryptText, err := keys.Decrypt(rand.Reader, encryptedBytes, nil, nil)
 	if err != nil {
 		app.logger.Infof("Decryption error %v", err)
-		dialog.ShowError(ErrDecrypt, app.w)
+		dialog.ShowError(err, app.w)
 		return
 	}
 

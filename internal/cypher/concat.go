@@ -38,7 +38,6 @@ func concatKDF(hash hash.Hash, z, s1 []byte, kdLen int) (k []byte, err error) {
 
 	counter := []byte{0, 0, 0, 1}
 	k = make([]byte, 0)
-
 	for i := 0; i <= reps; i++ {
 		hash.Write(counter)
 		hash.Write(z)

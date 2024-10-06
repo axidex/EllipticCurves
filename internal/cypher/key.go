@@ -57,6 +57,7 @@ func (prv *PrivateKey) GenerateShared(pub *PublicKey, skLen, macLen int) (sk []b
 	if prv.PublicKey.Curve != pub.Curve {
 		return nil, ErrInvalidCurve
 	}
+	//fmt.Println("skLen+macLen:", skLen+macLen, "MaxSharedKeyLength:", MaxSharedKeyLength(pub))
 	if skLen+macLen > MaxSharedKeyLength(pub) {
 		return nil, ErrSharedKeyTooBig
 	}
@@ -67,6 +68,13 @@ func (prv *PrivateKey) GenerateShared(pub *PublicKey, skLen, macLen int) (sk []b
 
 	sk = make([]byte, skLen+macLen)
 	skBytes := x.Bytes()
+
+	//fmt.Println("Length of skBytes:", len(skBytes), "Total length of sk:", len(sk))
+
+	//Check if skBytes can fit into sk
+	if len(skBytes) > len(sk) {
+		return nil, ErrSharedKeyTooBig
+	}
 	copy(sk[len(sk)-len(skBytes):], skBytes)
 	return sk, nil
 }

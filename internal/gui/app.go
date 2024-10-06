@@ -18,7 +18,7 @@ type AppGui struct {
 	openText, closedText                 *widget.Entry
 	curveInfoEntry, eciesInfo            *widget.Entry
 	encrypt, decrypt, generateKeysButton *widget.Button
-	selectCurve, selectParams            *widget.Select
+	selectCurve                          *widget.Select
 	w                                    fyne.Window
 
 	width, height float32
@@ -43,8 +43,8 @@ func NewAppGui(app fyne.App, logger logger.Logger) AppGui {
 }
 
 func (app *AppGui) initSelect() {
-	app.selectParams = widget.NewSelect(ParamNames, func(string) {})
-	app.selectParams.SetSelectedIndex(0)
+	//app.selectParams = widget.NewSelect(ParamNames, func(string) {})
+	//app.selectParams.SetSelectedIndex(0)
 
 	app.selectCurve = widget.NewSelect(CurveNames, func(string) {})
 	app.selectCurve.SetSelectedIndex(0)
@@ -100,7 +100,6 @@ func (app *AppGui) Run() {
 		app.closedText,
 		app.eciesInfo,
 		app.decrypt,
-		app.selectParams,
 	)
 
 	rightContainer := container.NewVBox(
@@ -108,14 +107,13 @@ func (app *AppGui) Run() {
 		app.openText,
 		app.curveInfoEntry,
 		app.encrypt,
-		app.selectCurve,
 	)
 
 	topContainer := container.NewGridWithColumns(2, leftContainer, rightContainer)
 
 	bottomContainer := container.NewGridWrap(
 		fyne.NewSize(app.width, app.generateKeysButton.MinSize().Height),
-		app.generateKeysButton,
+		app.generateKeysButton, app.selectCurve,
 	)
 
 	appContainer := container.NewVBox(topContainer, bottomContainer)
