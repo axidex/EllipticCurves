@@ -16,7 +16,7 @@ type AppGui struct {
 	logger                               logger.Logger
 	privateKeyEntry, publicKeyEntry      *widget.Entry
 	openText, closedText                 *widget.Entry
-	curveInfoEntry                       *widget.Entry
+	curveInfoEntry, eciesInfo            *widget.Entry
 	encrypt, decrypt, generateKeysButton *widget.Button
 	w                                    fyne.Window
 
@@ -34,7 +34,7 @@ func NewAppGui(app fyne.App, logger logger.Logger) AppGui {
 	appGui.initEntry()
 	appGui.initButtons()
 
-	appGui.width = float32(680)
+	appGui.width = float32(1200)
 	//appGui.height = float32(1000)
 
 	return appGui
@@ -46,7 +46,7 @@ func (app *AppGui) initEntry() {
 	initEntry(app.privateKeyEntry, "Private Key", 8)
 
 	app.publicKeyEntry = widget.NewMultiLineEntry()
-	initEntry(app.publicKeyEntry, "Public Key", 7)
+	initEntry(app.publicKeyEntry, "Public Key", 8)
 
 	app.openText = widget.NewMultiLineEntry()
 	initEntry(app.openText, "Open Text", 3)
@@ -55,8 +55,12 @@ func (app *AppGui) initEntry() {
 	initEntry(app.closedText, "Closed Text", 3)
 
 	app.curveInfoEntry = widget.NewMultiLineEntry()
-	initEntry(app.curveInfoEntry, "Curve Info", 6)
+	initEntry(app.curveInfoEntry, "Curve Info", 7)
 	app.curveInfoEntry.Disable()
+
+	app.eciesInfo = widget.NewMultiLineEntry()
+	initEntry(app.eciesInfo, "ECIES Info", 7)
+	app.eciesInfo.Disable()
 
 }
 
@@ -68,7 +72,6 @@ func initEntry(entry *widget.Entry, name string, numberOfLines int) {
 }
 
 func (app *AppGui) initButtons() {
-	// Создаем кнопки
 	app.encrypt = widget.NewButton("Encrypt", app.encryptData)
 	app.decrypt = widget.NewButton("Decrypt", app.decryptData)
 
@@ -78,25 +81,34 @@ func (app *AppGui) initButtons() {
 func (app *AppGui) Run() {
 
 	app.height = app.privateKeyEntry.MinSize().Height +
-		app.publicKeyEntry.MinSize().Height +
-		app.openText.MinSize().Height +
 		app.closedText.MinSize().Height +
-		app.encrypt.MinSize().Height +
-		app.decrypt.MinSize().Height +
-		app.generateKeysButton.MinSize().Height + 50
+		app.eciesInfo.MinSize().Height +
+		app.decrypt.MinSize().Height + 40
 
-	content := container.NewVBox(
+	leftContainer := container.NewVBox(
 		app.privateKeyEntry,
+		app.closedText,
+		app.eciesInfo,
+		app.decrypt,
+	)
+
+	rightContainer := container.NewVBox(
 		app.publicKeyEntry,
 		app.openText,
-		app.closedText,
 		app.curveInfoEntry,
 		app.encrypt,
-		app.decrypt,
+	)
+
+	topContainer := container.NewGridWithColumns(2, leftContainer, rightContainer)
+
+	bottomContainer := container.NewGridWrap(
+		fyne.NewSize(app.width, app.generateKeysButton.MinSize().Height),
 		app.generateKeysButton,
 	)
 
-	app.w.SetContent(content)
+	appContainer := container.NewVBox(topContainer, bottomContainer)
+
+	app.w.SetContent(appContainer)
 
 	size := fyne.NewSize(app.width, app.height)
 	app.w.Resize(size)

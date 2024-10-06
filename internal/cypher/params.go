@@ -60,20 +60,19 @@ var paramsFromCurve = map[elliptic.Curve]*ECIESParams{
 // ParamsFromCurve selects parameters optimal for the selected elliptic curve.
 // Only the curves P256, P384, and P512 are supported.
 func ParamsFromCurve(curve elliptic.Curve) (params *ECIESParams) {
-	return paramsFromCurve[curve]
+	//return paramsFromCurve[curve]
 
-	/*
-		switch curve {
-		case elliptic.P256():
-			return ECIES_AES128_SHA256
-		case elliptic.P384():
-			return ECIES_AES256_SHA384
-		case elliptic.P521():
-			return ECIES_AES256_SHA512
-		default:
-			return nil
-		}
-	*/
+	switch curve {
+	case elliptic.P256():
+		return EciesAes128Sha256
+	case elliptic.P384():
+		return EciesAes256Sha384
+	case elliptic.P521():
+		return EciesAes256Sha512
+	default:
+		return nil
+	}
+
 }
 
 // DefaultCurve The default curve for this package is the NIST P256 curve, which

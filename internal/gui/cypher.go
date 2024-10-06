@@ -3,7 +3,6 @@ package gui
 import (
 	"crypto/rand"
 	"errors"
-	"fmt"
 	"fyne.io/fyne/v2/dialog"
 	"github.com/axidex/elliptic/internal/cypher"
 )
@@ -32,16 +31,7 @@ func (app *AppGui) generateKeys() {
 		return
 	}
 
-	curveInfoString := "y² = x³ - 3x + b\n" +
-		"B: %d\n" +
-		"X: %d\n" +
-		"Y: %d\n" +
-		"Curve: %s\n" +
-		"BitSize: %d"
-
-	curveInfo := fmt.Sprintf(curveInfoString, keys.Curve.Params().B, keys.Curve.Params().Gx, keys.Curve.Params().Gy, keys.Curve.Params().Name, keys.Curve.Params().BitSize)
-
-	app.curveInfoEntry.SetText(curveInfo)
+	app.setPrivateKeyInfo(keys)
 
 	private, err := cypher.ExportPrivatePEM(keys)
 	if err != nil {
@@ -75,6 +65,8 @@ func (app *AppGui) encryptData() {
 		return
 	}
 
+	app.setPublicKeyInfo(key)
+
 	encryptedText, err := cypher.Encrypt(rand.Reader, key, []byte(text), nil, nil)
 	if err != nil {
 		app.logger.Errorf("Encryption error %v", err)
@@ -92,16 +84,18 @@ func (app *AppGui) decryptData() {
 
 	app.logger.Infof("Got task decryption")
 
-	key, err := cypher.ImportPrivatePEM(pemKey)
+	keys, err := cypher.ImportPrivatePEM(pemKey)
 	if err != nil {
 		app.logger.Infof("Not valid key: %v", err)
 		dialog.ShowError(ErrImportingKeys, app.w)
 		return
 	}
 
+	app.setPrivateKeyInfo(keys)
+
 	//app.logger.Infof("Decrypting data %s", encryptedBytes)
 
-	decryptText, err := key.Decrypt(rand.Reader, encryptedBytes, nil, nil)
+	decryptText, err := keys.Decrypt(rand.Reader, encryptedBytes, nil, nil)
 	if err != nil {
 		app.logger.Infof("Decryption error %v", err)
 		dialog.ShowError(ErrDecrypt, app.w)
