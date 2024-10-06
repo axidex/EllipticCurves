@@ -22,9 +22,10 @@ func (app *AppGui) generateKeys() {
 		dialog.ShowError(ErrGeneratingKeys, app.w)
 		return
 	}
-
+	params := ParamName(app.selectParams.Selected).GetParamByName()
+	curve := CurveName(app.selectCurve.Selected).GetCurveByName()
 	// Генерируем случайные ключи
-	keys, err := cypher.GenerateKey(rand.Reader, cypher.DefaultCurve, nil)
+	keys, err := cypher.GenerateKey(rand.Reader, curve, params)
 	if err != nil {
 		app.logger.Errorf("GenerateKey err: %s", err)
 		dialog.ShowError(ErrGeneratingKeys, app.w)

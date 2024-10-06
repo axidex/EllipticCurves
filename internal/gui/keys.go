@@ -15,13 +15,19 @@ func (app *AppGui) setPrivateKeyInfo(keys *cypher.PrivateKey) {
 
 	curveInfo := fmt.Sprintf(curveInfoString, keys.Curve.Params().B, keys.Curve.Params().Gx, keys.Curve.Params().Gy, keys.Curve.Params().Name, keys.Curve.Params().BitSize)
 
-	eciesInfoString := "CryptoAlgorithm: %s BlockSize: %d\n" +
-		"HashAlgorithm: %s\n" +
+	eciesInfoString := "Algorithm: %s\n" +
+		"BlockSize: %d\tKeyLength: %d\n" +
 		"X: %d\n" +
 		"Y: %d\n" +
-		"D: %s\n" +
-		"KeyLength: %d"
-	eciesInfo := fmt.Sprintf(eciesInfoString, "AES", keys.Params.BlockSize, "SHA256", keys.X, keys.Y, keys.D, keys.PublicKey.Params.KeyLen)
+		"D: %s"
+
+	paramName := GetNameByParam(keys.Params)
+	eciesInfo := fmt.Sprintf(
+		eciesInfoString,
+		paramName,
+		keys.PublicKey.Params.KeyLen, keys.Params.BlockSize,
+		keys.X, keys.Y, keys.D,
+	)
 
 	app.curveInfoEntry.SetText(curveInfo)
 	app.eciesInfo.SetText(eciesInfo)
@@ -37,12 +43,19 @@ func (app *AppGui) setPublicKeyInfo(keys *cypher.PublicKey) {
 
 	curveInfo := fmt.Sprintf(curveInfoString, keys.Curve.Params().B, keys.Curve.Params().Gx, keys.Curve.Params().Gy, keys.Curve.Params().Name, keys.Curve.Params().BitSize)
 
-	eciesInfoString := "CryptoAlgorithm: %s BlockSize: %d\n" +
-		"HashAlgorithm: %s\n" +
+	eciesInfoString := "Algorithm: %s\n" +
+		"BlockSize: %d\tKeyLength: %d\n" +
 		"X: %d\n" +
 		"Y: %d\n" +
-		"KeyLength: %d"
-	eciesInfo := fmt.Sprintf(eciesInfoString, "AES", keys.Params.BlockSize, "SHA256", keys.X, keys.Y, keys.Params.KeyLen)
+		"D: 0"
+
+	paramName := GetNameByParam(keys.Params)
+	eciesInfo := fmt.Sprintf(
+		eciesInfoString,
+		paramName,
+		keys.Params.KeyLen, keys.Params.BlockSize,
+		keys.X, keys.Y,
+	)
 
 	app.curveInfoEntry.SetText(curveInfo)
 	app.eciesInfo.SetText(eciesInfo)
